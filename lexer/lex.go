@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"unicode"
 )
 
 // Lexer represents an Ecmascript lexer
@@ -38,29 +39,44 @@ func (l *Lexer) read() rune {
 func (l *Lexer) Next() *Token {
 	for {
 		r := l.read()
-		switch r {
-		case '(':
+		switch {
+		case isSpace(r):
+		case r == '(':
 			return mkToken(TOpenParen, "(")
-		case ')':
+		case r == ')':
 			return mkToken(TCloseParen, ")")
-		case '{':
+		case r == '{':
 			return mkToken(TOpenBrace, "{")
-		case '}':
+		case r == '}':
 			return mkToken(TCloseBrace, "}")
-		case '[':
+		case r == '[':
 			return mkToken(TOpenBracket, "[")
-		case ']':
+		case r == ']':
 			return mkToken(TCloseBracket, "]")
-		case ',':
+		case r == ',':
 			return mkToken(TComma, ",")
-		case ':':
+		case r == ':':
 			return mkToken(TColon, ":")
-		case ';':
+		case r == ';':
 			return mkToken(TSemicolon, ";")
-		case '@':
+		case r == '@':
 			return mkToken(TAt, "@")
-		case '~':
+		case r == '~':
 			return mkToken(TTilde, "~")
 		}
+	}
+}
+
+// isSpace checks whether r is a space as defined
+// in the Unicode standard or the ECMAScript specification
+func isSpace(r rune) bool {
+	switch {
+	case
+		unicode.IsSpace(r),
+		r == '\uFEFF': // zero width non-breaking space
+		return true
+
+	default:
+		return false
 	}
 }
