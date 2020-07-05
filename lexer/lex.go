@@ -71,6 +71,8 @@ func (l *Lexer) Next() *Token {
 // in the Unicode standard or the ECMAScript specification
 func isSpace(r rune) bool {
 	switch {
+	case r == 0x85:
+		return false
 	case
 		unicode.IsSpace(r),
 		r == '\uFEFF': // zero width non-breaking space
