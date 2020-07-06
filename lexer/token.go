@@ -5,204 +5,205 @@ import (
 	"math/big"
 )
 
-// T represents a generic token
-type T int
+// Type represents an ECMAScript token type
+type Type int
 
+// Definition of tokens constants
 const (
-	TEndOfFile T = iota
-	TSyntaxError
+	tokSyntaxError Type = iota
+	tokEndOfFile
 
-	THashbang
+	tokHashbang
 
-	TNoSubstitutionTemplateLiteral
-	TNumericLiteral
-	TStringLiteral
+	tokNoSubstitutionTemplateLiteral
+	tokNumericLiteral
+	tokStringLiteral
 
 	// Punctuation
-	TAmpersand
-	TAmpersandAmpersand
-	TAsterisk
-	TAsteriskAsterisk
-	TAt
-	TBar
-	TBarBar
-	TCaret
-	TCloseBrace
-	TCloseBracket
-	TCloseParen
-	TColon
-	TComma
-	TDot
-	TDotDotDot
-	TEqualsEquals
-	TEqualsEqualsEquals
-	TEqualsGreaterThan
-	TExclamation
-	TExclamationEquals
-	TExclamationEqualsEquals
-	TGreaterThan
-	TGreaterThanEquals
-	TGreaterThanGreaterThan
-	TGreaterThanGreaterThanGreaterThan
-	TLessThan
-	TLessThanEquals
-	TLessThanLessThan
-	TMinus
-	TMinusMinus
-	TOpenBrace
-	TOpenBracket
-	TOpenParen
-	TPercent
-	TPlus
-	TPlusPlus
-	TQuestion
-	TQuestionDot
-	TQuestionQuestion
-	TSemicolon
-	TSlash
-	TTilde
+	tokAmpersand
+	tokAmpersandAmpersand
+	tokAsterisk
+	tokAsteriskAsterisk
+	tokAt
+	tokBar
+	tokBarBar
+	tokCaret
+	tokCloseBrace
+	tokCloseBracket
+	tokCloseParen
+	tokColon
+	tokComma
+	tokDot
+	tokDotDotDot
+	tokEqualsEquals
+	tokEqualsEqualsEquals
+	tokEqualsGreaterThan
+	tokExclamation
+	tokExclamationEquals
+	tokExclamationEqualsEquals
+	tokGreaterThan
+	tokGreaterThanEquals
+	tokGreaterThanGreaterThan
+	tokGreaterThanGreaterThanGreaterThan
+	tokLessThan
+	tokLessThanEquals
+	tokLessThanLessThan
+	tokMinus
+	tokMinusMinus
+	tokOpenBrace
+	tokOpenBracket
+	tokOpenParen
+	tokPercent
+	tokPlus
+	tokPlusPlus
+	tokQuestion
+	tokQuestionDot
+	tokQuestionQuestion
+	tokSemicolon
+	tokSlash
+	tokTilde
 
 	// Assignments
-	TAmpersandAmpersandEquals
-	TAmpersandEquals
-	TAsteriskAsteriskEquals
-	TAsteriskEquals
-	TBarBarEquals
-	TBarEquals
-	TCaretEquals
-	TEquals
-	TGreaterThanGreaterThanEquals
-	TGreaterThanGreaterThanGreaterThanEquals
-	TLessThanLessThanEquals
-	TMinusEquals
-	TPercentEquals
-	TPlusEquals
-	TQuestionQuestionEquals
-	TSlashEquals
+	tokAmpersandAmpersandEquals
+	tokAmpersandEquals
+	tokAsteriskAsteriskEquals
+	tokAsteriskEquals
+	tokBarBarEquals
+	tokBarEquals
+	tokCaretEquals
+	tokEquals
+	tokGreaterThanGreaterThanEquals
+	tokGreaterThanGreaterThanGreaterThanEquals
+	tokLessThanLessThanEquals
+	tokMinusEquals
+	tokPercentEquals
+	tokPlusEquals
+	tokQuestionQuestionEquals
+	tokSlashEquals
 
 	// Class-private fields and methods
-	TPrivateIdentifier
+	tokPrivateIdentifier
 
 	// Identifiers
-	TIdentifier
-	TEscapedKeyword
+	tokIdentifier
+	tokEscapedKeyword
 
 	// Reserved words
-	TBreak
-	TCase
-	TCatch
-	TClass
-	TConst
-	TContinue
-	TDebugger
-	TDefault
-	TDelete
-	TDo
-	TElse
-	TEnum
-	TExport
-	TExtends
-	TFalse
-	TFinally
-	TFor
-	TFunction
-	TIf
-	TImport
-	TIn
-	TInstanceof
-	TNew
-	TNull
-	TReturn
-	TSuper
-	TSwitch
-	TThis
-	TThrow
-	TTrue
-	TTry
-	TTypeof
-	TVar
-	TVoid
-	TWhile
-	TWith
+	tokBreak
+	tokCase
+	tokCatch
+	tokClass
+	tokConst
+	tokContinue
+	tokDebugger
+	tokDefault
+	tokDelete
+	tokDo
+	tokElse
+	tokEnum
+	tokExport
+	tokExtends
+	tokFalse
+	tokFinally
+	tokFor
+	tokFunction
+	tokIf
+	tokImport
+	tokIn
+	tokInstanceof
+	tokNew
+	tokNull
+	tokReturn
+	tokSuper
+	tokSwitch
+	tokThis
+	tokThrow
+	tokTrue
+	tokTry
+	tokTypeof
+	tokVar
+	tokVoid
+	tokWhile
+	tokWith
 
 	// Strict mode reserved words
-	TImplements
-	TInterface
-	TLet
-	TPackage
-	TPrivate
-	TProtected
-	TPublic
-	TStatic
-	TYield
+	tokImplements
+	tokInterface
+	tokLet
+	tokPackage
+	tokPrivate
+	tokProtected
+	tokPublic
+	tokStatic
+	tokYield
 )
 
-var keywords = map[string]T{
+var keywords = map[string]Type{
 	// Reserved words
-	"break":      TBreak,
-	"case":       TCase,
-	"catch":      TCatch,
-	"class":      TClass,
-	"const":      TConst,
-	"continue":   TContinue,
-	"debugger":   TDebugger,
-	"default":    TDefault,
-	"delete":     TDelete,
-	"do":         TDo,
-	"else":       TElse,
-	"enum":       TEnum,
-	"export":     TExport,
-	"extends":    TExtends,
-	"false":      TFalse,
-	"finally":    TFinally,
-	"for":        TFor,
-	"function":   TFunction,
-	"if":         TIf,
-	"import":     TImport,
-	"in":         TIn,
-	"instanceof": TInstanceof,
-	"new":        TNew,
-	"null":       TNull,
-	"return":     TReturn,
-	"super":      TSuper,
-	"switch":     TSwitch,
-	"this":       TThis,
-	"throw":      TThrow,
-	"true":       TTrue,
-	"try":        TTry,
-	"typeof":     TTypeof,
-	"var":        TVar,
-	"void":       TVoid,
-	"while":      TWhile,
-	"with":       TWith,
+	"break":      tokBreak,
+	"case":       tokCase,
+	"catch":      tokCatch,
+	"class":      tokClass,
+	"const":      tokConst,
+	"continue":   tokContinue,
+	"debugger":   tokDebugger,
+	"default":    tokDefault,
+	"delete":     tokDelete,
+	"do":         tokDo,
+	"else":       tokElse,
+	"enum":       tokEnum,
+	"export":     tokExport,
+	"extends":    tokExtends,
+	"false":      tokFalse,
+	"finally":    tokFinally,
+	"for":        tokFor,
+	"function":   tokFunction,
+	"if":         tokIf,
+	"import":     tokImport,
+	"in":         tokIn,
+	"instanceof": tokInstanceof,
+	"new":        tokNew,
+	"null":       tokNull,
+	"return":     tokReturn,
+	"super":      tokSuper,
+	"switch":     tokSwitch,
+	"this":       tokThis,
+	"throw":      tokThrow,
+	"true":       tokTrue,
+	"try":        tokTry,
+	"typeof":     tokTypeof,
+	"var":        tokVar,
+	"void":       tokVoid,
+	"while":      tokWhile,
+	"with":       tokWith,
 
 	// Strict mode reserved words
-	"implements": TImplements,
-	"interface":  TInterface,
-	"let":        TLet,
-	"package":    TPackage,
-	"private":    TPrivate,
-	"protected":  TProtected,
-	"public":     TPublic,
-	"static":     TStatic,
-	"yield":      TYield,
+	"implements": tokImplements,
+	"interface":  tokInterface,
+	"let":        tokLet,
+	"package":    tokPackage,
+	"private":    tokPrivate,
+	"protected":  tokProtected,
+	"public":     tokPublic,
+	"static":     tokStatic,
+	"yield":      tokYield,
 }
 
 // Token represents an Ecmascript token
 type Token struct {
-	typ  T
+	typ  Type
 	text string   // empty for numbers
 	num  *big.Int // nil for non-numbers
 }
 
-func mkToken(typ T, text string) *Token {
-	if typ == TNumericLiteral {
+func mkToken(typ Type, text string) *Token {
+	if typ == tokNumericLiteral {
 		var z big.Int
 		num, ok := z.SetString(text, 0)
 		if !ok {
 			log.Fatalf("bad number syntax: %s", text)
 		}
-		return &Token{TNumericLiteral, "", num}
+		return &Token{tokNumericLiteral, "", num}
 	}
 
 	t, ok := keywords[text]
