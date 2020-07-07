@@ -69,26 +69,41 @@ func TestKeyword(t *testing.T) {
 }
 
 func TestPeek(t *testing.T) {
-	sample := "=== == => = + += ++ - -= -- * *= ** **="
+	sample := "=== == => = + += ++ - -= -- * *= ** **= / /= > >> >>> >= >>= >>>="
 
 	tests := []struct {
 		expTyp  Type
 		expText string
 	}{
+		// '=' or '=>' or '==' or '==='
 		{tokEqualsEqualsEquals, "==="},
 		{tokEqualsEquals, "=="},
 		{tokEqualsGreaterThan, "=>"},
 		{tokEquals, "="},
+
+		// '+' or '+=' or '++'
 		{tokPlus, "+"},
 		{tokPlusEquals, "+="},
 		{tokPlusPlus, "++"},
 		{tokMinus, "-"},
 		{tokMinusEquals, "-="},
 		{tokMinusMinus, "--"},
+
+		// '*' or '*=' or '**' or '**='
 		{tokAsterisk, "*"},
 		{tokAsteriskEquals, "*="},
 		{tokAsteriskAsterisk, "**"},
 		{tokAsteriskAsteriskEquals, "**="},
+		{tokSlash, "/"},
+		{tokSlashEquals, "/="},
+
+		// '>' or '>>' or '>>>' or '>=' or '>>=' or '>>>='
+		{tokGreaterThan, ">"},
+		{tokGreaterThanGreaterThan, ">>"},
+		{tokGreaterThanGreaterThanGreaterThan, ">>>"},
+		{tokGreaterThanEquals, ">="},
+		{tokGreaterThanGreaterThanEquals, ">>="},
+		{tokGreaterThanGreaterThanGreaterThanEquals, ">>>="},
 	}
 
 	r := io.RuneReader(strings.NewReader(sample))

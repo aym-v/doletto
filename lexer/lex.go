@@ -139,6 +139,37 @@ func (l *Scanner) next() *Token {
 				return l.mkPeekTok(tokAsteriskAsterisk, "**")
 			}
 			return mkToken(tokAsterisk, "*")
+
+		case r == '/':
+			// '/' or '/=' or '//' or '/* ... */'
+			switch l.peek(1) {
+			case '=':
+				return l.mkPeekTok(tokSlashEquals, "/=")
+			case '/':
+				// Single line comment
+			case '*':
+				// Multi line comment
+			}
+			return mkToken(tokSlash, "/")
+
+		case r == '>':
+			// '>' or '>>' or '>>>' or '>=' or '>>=' or '>>>='
+			switch l.peek(1) {
+			case '>':
+				switch l.peek(2) {
+				case '>':
+					if l.peek(3) == '=' {
+						return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThanEquals, ">>>=")
+					}
+					return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThan, ">>>")
+				case '=':
+					return l.mkPeekTok(tokGreaterThanGreaterThanEquals, ">>=")
+				}
+				return l.mkPeekTok(tokGreaterThanGreaterThan, ">>")
+			case '=':
+				return l.mkPeekTok(tokGreaterThanEquals, ">=")
+			}
+			return mkToken(tokGreaterThan, ">")
 		}
 	}
 }
