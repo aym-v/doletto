@@ -10,8 +10,8 @@ type Type int
 
 // Definition of tokens constants
 const (
-	tokSyntaxError Type = iota
-	tokEndOfFile
+	tokEndOfFile Type = iota
+	tokSyntaxError
 
 	tokHashbang
 

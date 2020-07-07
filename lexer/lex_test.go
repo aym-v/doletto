@@ -1,32 +1,87 @@
 package lexer
 
 import (
-	"bufio"
+	"io"
 	"strings"
 	"testing"
 )
 
-func TestToken(t *testing.T) {
+func TestBrackets(t *testing.T) {
 	sample := "({[]})"
 
 	tests := []struct {
-		expTyp  T
+		expTyp  Type
 		expText string
 	}{
-		{TOpenParen, "("},
-		{TOpenBrace, "{"},
-		{TOpenBracket, "["},
-		{TCloseBracket, "]"},
-		{TCloseBrace, "}"},
-		{TCloseParen, ")"},
+		{tokOpenParen, "("},
+		{tokOpenBrace, "{"},
+		{tokOpenBracket, "["},
+		{tokCloseBracket, "]"},
+		{tokCloseBrace, "}"},
+		{tokCloseParen, ")"},
 	}
 
-	rd := bufio.NewReader(strings.NewReader(sample))
+	r := io.RuneReader(strings.NewReader(sample))
 
-	l := NewLexer(rd)
+	l := New(&r)
 
 	for _, c := range tests {
-		tok := l.Next()
+		tok := l.next()
+
+		if tok.typ != c.expTyp {
+			t.Fatalf("token type is wrong. expected=%q, got=%q", c.expTyp, tok.typ)
+		}
+
+		if tok.text != c.expText {
+			t.Fatalf("token text is wrong. expected=%q, got=%q", c.expText, tok.text)
+		}
+	}
+}
+
+func TestKeyword(t *testing.T) {
+	sample := "const"
+
+	tests := []struct {
+		expTyp  Type
+		expText string
+	}{
+		{tokConst, "const"},
+	}
+
+	r := io.RuneReader(strings.NewReader(sample))
+
+	l := New(&r)
+
+	for _, c := range tests {
+		tok := l.next()
+
+		if tok.typ != c.expTyp {
+			t.Fatalf("token type is wrong. expected=%q, got=%q", c.expTyp, tok.typ)
+		}
+
+		if tok.text != c.expText {
+			t.Fatalf("token text is wrong. expected=%q, got=%q", c.expText, tok.text)
+		}
+	}
+}
+
+func TestPeek(t *testing.T) {
+	sample := "=== =="
+
+	tests := []struct {
+		expTyp  Type
+		expText string
+	}{
+		{tokEqualsEqualsEquals, "==="},
+		{tokEqualsEquals, "=="},
+	}
+
+	r := io.RuneReader(strings.NewReader(sample))
+
+	l := New(&r)
+
+	for _, c := range tests {
+		tok := l.next()
 
 		if tok.typ != c.expTyp {
 			t.Fatalf("token type is wrong. expected=%q, got=%q", c.expTyp, tok.typ)
