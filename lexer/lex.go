@@ -10,8 +10,9 @@ import (
 
 // Scanner holds the state of the scanner.
 type Scanner struct {
-	r   io.RuneReader // input reader
-	buf bytes.Buffer  // input buffer to hold current lexeme
+	r         io.RuneReader // input reader
+	peekRunes []rune        // peek runes queue
+	buf       bytes.Buffer  // input buffer to hold current lexeme
 }
 
 // New creates a new Scanner.
@@ -21,8 +22,8 @@ func New(r *io.RuneReader) *Scanner {
 	}
 }
 
-// read reads the next rune from the input.
-func (l *Scanner) read() rune {
+// nextRune reads the next rune from the input.
+func (l *Scanner) nextRune() rune {
 	r, _, err := l.r.ReadRune()
 	if err != nil {
 		if err != io.EOF {
@@ -33,10 +34,33 @@ func (l *Scanner) read() rune {
 	return r
 }
 
-// peek returns but does not consume the next rune in the input.
-// func (l *Scanner) peek(n int) rune {
+// read consumes the peekRunes queue then calls nextRune.
+func (l *Scanner) read() rune {
+	if len(l.peekRunes) > 0 {
+		r := l.peekRunes[0]
+		l.peekRunes = l.peekRunes[1:]
+		return r
+	}
+	return l.nextRune()
+}
 
-// }
+// peek returns but does not consume the next n rune in the input.
+func (l *Scanner) peek(n int) rune {
+	if len(l.peekRunes) >= n {
+		return l.peekRunes[n-1]
+	}
+
+	p := l.nextRune()
+	l.peekRunes = append(l.peekRunes, p)
+
+	return p
+}
+
+// resetPeek resets the peekRunes queue and calls mkToken
+func (l *Scanner) mkPeekTok(typ Type, text string) *Token {
+	l.peekRunes = nil
+	return mkToken(typ, text)
+}
 
 // next returns the next token.
 func (l *Scanner) next() *Token {
@@ -68,10 +92,59 @@ func (l *Scanner) next() *Token {
 			return mkToken(tokTilde, "~")
 		case isAlphanum(r):
 			return l.alphanum(tokIdentifier, r)
+		case isNumber(r):
+			// return l.number(r)
+		case r == '=':
+			// '=' or '=>' or '==' or '==='
+			switch l.peek(1) {
+			case '=':
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokEqualsEqualsEquals, "===")
+				}
+				return l.mkPeekTok(tokEqualsEquals, "==")
+			case '>':
+				return l.mkPeekTok(tokEqualsGreaterThan, "=>")
+			}
+			return mkToken(tokEquals, "=")
+
+		case r == '+':
+			// '+' or '+=' or '++'
+			switch l.peek(1) {
+			case '=':
+				return l.mkPeekTok(tokPlusEquals, "+=")
+			case '+':
+				return l.mkPeekTok(tokPlusPlus, "++")
+			}
+			return mkToken(tokPlus, "+")
+
+		case r == '-':
+			// '-' or '-=' or '--'
+			switch l.peek(1) {
+			case '=':
+				return l.mkPeekTok(tokMinusEquals, "-=")
+			case '-':
+				return l.mkPeekTok(tokMinusMinus, "--")
+			}
+			return mkToken(tokMinus, "-")
+
+		case r == '*':
+			// '*' or '*=' or '**' or '**='
+			switch l.peek(1) {
+			case '=':
+				return l.mkPeekTok(tokAsteriskEquals, "*=")
+			case '*':
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokAsteriskAsteriskEquals, "**=")
+				}
+				return l.mkPeekTok(tokAsteriskAsterisk, "**")
+			}
+			return mkToken(tokAsterisk, "*")
 		}
 	}
 }
 
+// accum appends the current rune to the buffer until
+// the valid function returns false
 func (l *Scanner) accum(r rune, valid func(rune) bool) {
 	l.buf.Reset()
 	for {
@@ -86,14 +159,25 @@ func (l *Scanner) accum(r rune, valid func(rune) bool) {
 	}
 }
 
+// alphanum creates a keyword or identifier token using the buffer.
 func (l *Scanner) alphanum(typ Type, r rune) *Token {
 	l.accum(r, isAlphanum)
 	return mkToken(typ, l.buf.String())
 }
 
+// alphanum creates a numeric literal token using the buffer.
+// func (l *Scanner) number(r rune) *Token {
+
+// }
+
 // isAlphaNumeric reports whether r is an alphabetic, digit, or underscore.
 func isAlphanum(r rune) bool {
 	return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+}
+
+// isAlphaNumeric reports whether r is a numeric literal.
+func isNumber(r rune) bool {
+	return '0' <= r && r <= '9'
 }
 
 // isSpace checks whether r is a space as defined

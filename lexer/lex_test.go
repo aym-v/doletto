@@ -39,13 +39,16 @@ func TestBrackets(t *testing.T) {
 }
 
 func TestKeyword(t *testing.T) {
-	sample := "const"
+	sample := "const foo = 1"
 
 	tests := []struct {
 		expTyp  Type
 		expText string
 	}{
 		{tokConst, "const"},
+		{tokIdentifier, "foo"},
+		{tokEquals, "="},
+		// {tokNumericLiteral, "1"},
 	}
 
 	r := io.RuneReader(strings.NewReader(sample))
@@ -66,7 +69,7 @@ func TestKeyword(t *testing.T) {
 }
 
 func TestPeek(t *testing.T) {
-	sample := "=== =="
+	sample := "=== == => = + += ++ - -= -- * *= ** **="
 
 	tests := []struct {
 		expTyp  Type
@@ -74,6 +77,18 @@ func TestPeek(t *testing.T) {
 	}{
 		{tokEqualsEqualsEquals, "==="},
 		{tokEqualsEquals, "=="},
+		{tokEqualsGreaterThan, "=>"},
+		{tokEquals, "="},
+		{tokPlus, "+"},
+		{tokPlusEquals, "+="},
+		{tokPlusPlus, "++"},
+		{tokMinus, "-"},
+		{tokMinusEquals, "-="},
+		{tokMinusMinus, "--"},
+		{tokAsterisk, "*"},
+		{tokAsteriskEquals, "*="},
+		{tokAsteriskAsterisk, "**"},
+		{tokAsteriskAsteriskEquals, "**="},
 	}
 
 	r := io.RuneReader(strings.NewReader(sample))
