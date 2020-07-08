@@ -39,14 +39,14 @@ func TestBrackets(t *testing.T) {
 }
 
 func TestKeyword(t *testing.T) {
-	sample := "const foo = 1"
+	sample := "const fo_oO = 1"
 
 	tests := []struct {
 		expTyp  Type
 		expText string
 	}{
 		{tokConst, "const"},
-		{tokIdentifier, "foo"},
+		{tokIdentifier, "fo_oO"},
 		{tokEquals, "="},
 		// {tokNumericLiteral, "1"},
 	}

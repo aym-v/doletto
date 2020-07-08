@@ -70,17 +70,18 @@ func (l *Scanner) next() *Token {
 		case r == '@':
 			return mkToken(tokAt, "@")
 		case isSpace(r):
-		case isAlphanum(r):
+		case isIdentifierStart(r):
+			// names and keywords
 			return l.alphanum(tokIdentifier, r)
 		case isNumber(r):
-			// return l.number(r)
 		case isPunctuator(r):
-			return l.scanPunctuator(r)
+			return l.lexPunctuator(r)
 		}
 	}
 }
 
-func (l *Scanner) scanPunctuator(r rune) *Token {
+// lexPunctuator returns the next punctuator token
+func (l *Scanner) lexPunctuator(r rune) *Token {
 	switch r {
 	case '(':
 		return mkToken(tokOpenParen, "(")
@@ -252,6 +253,7 @@ func (l *Scanner) scanPunctuator(r rune) *Token {
 			}
 			return l.mkPeekTok(tokQuestionQuestion, "??")
 		case '.':
+			// Differentiate optional chaining punctuators (?.id) from conditional operators (? :)
 			if !isNumber(l.peek(2)) {
 				return l.mkPeekTok(tokQuestionDot, "?.")
 			}
@@ -281,7 +283,7 @@ func (l *Scanner) accum(r rune, valid func(rune) bool) {
 
 // alphanum creates a keyword or identifier token using the buffer.
 func (l *Scanner) alphanum(typ Type, r rune) *Token {
-	l.accum(r, isAlphanum)
+	l.accum(r, isIdentifierContinue)
 	return mkToken(typ, l.buf.String())
 }
 
@@ -290,9 +292,9 @@ func (l *Scanner) alphanum(typ Type, r rune) *Token {
 
 // }
 
-// isAlphaNumeric reports whether r is an alphabetic, digit, or underscore.
+// isAlphaNumeric reports whether r is a letter, digit, or underscore.
 func isAlphanum(r rune) bool {
-	return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+	return r == '_' || r == '$' || unicode.IsLetter(r) || unicode.IsDigit(r)
 }
 
 // isNumber reports whether r is a numeric literal.
