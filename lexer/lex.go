@@ -94,6 +94,7 @@ func (l *Scanner) next() *Token {
 			return l.alphanum(tokIdentifier, r)
 		case isNumber(r):
 			// return l.number(r)
+
 		case r == '=':
 			// '=' or '=>' or '==' or '==='
 			switch l.peek(1) {
@@ -170,6 +171,29 @@ func (l *Scanner) next() *Token {
 				return l.mkPeekTok(tokGreaterThanEquals, ">=")
 			}
 			return mkToken(tokGreaterThan, ">")
+
+		case r == '<':
+			// '<' or '<<' or '<=' or '<<='
+			switch l.peek(1) {
+			case '<':
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokLessThanLessThanEquals, "<<=")
+				}
+				return l.mkPeekTok(tokLessThanLessThan, "<<")
+			case '=':
+				return l.mkPeekTok(tokLessThanEquals, "<=")
+			}
+			return mkToken(tokLessThan, "<")
+
+		case r == '!':
+			// '!' or '!=' or '!=='
+			if l.peek(1) == '=' {
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokExclamationEqualsEquals, "!==")
+				}
+				return l.mkPeekTok(tokExclamationEquals, "!=")
+			}
+			return mkToken(tokExclamation, "!")
 		}
 	}
 }
