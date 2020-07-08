@@ -70,7 +70,7 @@ func TestKeyword(t *testing.T) {
 
 func TestPeek(t *testing.T) {
 	sample := `
-	=== == => = + += ++ - -= -- * *= ** **= / /= > >> >>> >= >>= >>>=
+	( ) { } [ ] , : ; @ ~ === == => = + += ++ - -= -- * *= ** **= / /= > >> >>> >= >>= >>>=
 	! != !== < << <= <<= ^ ^= | |= || ||= & &= && &&= % %= ? ?. ?? ??=
 	`
 
@@ -78,6 +78,18 @@ func TestPeek(t *testing.T) {
 		expTyp  Type
 		expText string
 	}{
+		{tokOpenParen, "("},
+		{tokCloseParen, ")"},
+		{tokOpenBrace, "{"},
+		{tokCloseBrace, "}"},
+		{tokOpenBracket, "["},
+		{tokCloseBracket, "]"},
+		{tokComma, ","},
+		{tokColon, ":"},
+		{tokSemicolon, ";"},
+		{tokAt, "@"},
+		{tokTilde, "~"},
+
 		// '=' or '=>' or '==' or '==='
 		{tokEqualsEqualsEquals, "==="},
 		{tokEqualsEquals, "=="},

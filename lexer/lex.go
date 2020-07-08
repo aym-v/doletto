@@ -67,189 +67,199 @@ func (l *Scanner) next() *Token {
 	for {
 		r := l.read()
 		switch {
-		case isSpace(r):
-		case r == '(':
-			return mkToken(tokOpenParen, "(")
-		case r == ')':
-			return mkToken(tokCloseParen, ")")
-		case r == '{':
-			return mkToken(tokOpenBrace, "{")
-		case r == '}':
-			return mkToken(tokCloseBrace, "}")
-		case r == '[':
-			return mkToken(tokOpenBracket, "[")
-		case r == ']':
-			return mkToken(tokCloseBracket, "]")
-		case r == ',':
-			return mkToken(tokComma, ",")
-		case r == ':':
-			return mkToken(tokColon, ":")
-		case r == ';':
-			return mkToken(tokSemicolon, ";")
 		case r == '@':
 			return mkToken(tokAt, "@")
-		case r == '~':
-			return mkToken(tokTilde, "~")
+		case isSpace(r):
 		case isAlphanum(r):
 			return l.alphanum(tokIdentifier, r)
 		case isNumber(r):
 			// return l.number(r)
-
-		case r == '=':
-			// '=' or '=>' or '==' or '==='
-			switch l.peek(1) {
-			case '=':
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokEqualsEqualsEquals, "===")
-				}
-				return l.mkPeekTok(tokEqualsEquals, "==")
-			case '>':
-				return l.mkPeekTok(tokEqualsGreaterThan, "=>")
-			}
-			return l.mkPeekTok(tokEquals, "=")
-
-		case r == '+':
-			// '+' or '+=' or '++'
-			switch l.peek(1) {
-			case '=':
-				return l.mkPeekTok(tokPlusEquals, "+=")
-			case '+':
-				return l.mkPeekTok(tokPlusPlus, "++")
-			}
-			return l.mkPeekTok(tokPlus, "+")
-
-		case r == '-':
-			// '-' or '-=' or '--'
-			switch l.peek(1) {
-			case '=':
-				return l.mkPeekTok(tokMinusEquals, "-=")
-			case '-':
-				return l.mkPeekTok(tokMinusMinus, "--")
-			}
-			return l.mkPeekTok(tokMinus, "-")
-
-		case r == '*':
-			// '*' or '*=' or '**' or '**='
-			switch l.peek(1) {
-			case '=':
-				return l.mkPeekTok(tokAsteriskEquals, "*=")
-			case '*':
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokAsteriskAsteriskEquals, "**=")
-				}
-				return l.mkPeekTok(tokAsteriskAsterisk, "**")
-			}
-			return l.mkPeekTok(tokAsterisk, "*")
-
-		case r == '/':
-			// '/' or '/=' or '//' or '/* ... */'
-			switch l.peek(1) {
-			case '=':
-				return l.mkPeekTok(tokSlashEquals, "/=")
-			case '/':
-				// Single line comment
-			case '*':
-				// Multi line comment
-			}
-			return l.mkPeekTok(tokSlash, "/")
-
-		case r == '>':
-			// '>' or '>>' or '>>>' or '>=' or '>>=' or '>>>='
-			switch l.peek(1) {
-			case '>':
-				switch l.peek(2) {
-				case '>':
-					if l.peek(3) == '=' {
-						return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThanEquals, ">>>=")
-					}
-					return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThan, ">>>")
-				case '=':
-					return l.mkPeekTok(tokGreaterThanGreaterThanEquals, ">>=")
-				}
-				return l.mkPeekTok(tokGreaterThanGreaterThan, ">>")
-			case '=':
-				return l.mkPeekTok(tokGreaterThanEquals, ">=")
-			}
-			return l.mkPeekTok(tokGreaterThan, ">")
-
-		case r == '<':
-			// '<' or '<<' or '<=' or '<<='
-			switch l.peek(1) {
-			case '<':
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokLessThanLessThanEquals, "<<=")
-				}
-				return l.mkPeekTok(tokLessThanLessThan, "<<")
-			case '=':
-				return l.mkPeekTok(tokLessThanEquals, "<=")
-			}
-			return l.mkPeekTok(tokLessThan, "<")
-
-		case r == '!':
-			// '!' or '!=' or '!=='
-			if l.peek(1) == '=' {
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokExclamationEqualsEquals, "!==")
-				}
-				return l.mkPeekTok(tokExclamationEquals, "!=")
-			}
-			return l.mkPeekTok(tokExclamation, "!")
-
-		case r == '^':
-			// '^' or '^='
-			if l.peek(1) == '=' {
-				return l.mkPeekTok(tokCaretEquals, "^=")
-			}
-			return l.mkPeekTok(tokCaret, "^")
-
-		case r == '|':
-			// '|' or '|=' or '||' or '||='
-			switch l.peek(1) {
-			case '=':
-				return l.mkPeekTok(tokBarEquals, "|=")
-			case '|':
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokBarBarEquals, "||=")
-				}
-				return l.mkPeekTok(tokBarBar, "||")
-			}
-			return l.mkPeekTok(tokBar, "|")
-
-		case r == '&':
-			// '&' or '&=' or '&&' or '&&='
-			switch l.peek(1) {
-			case '=':
-				return l.mkPeekTok(tokAmpersandEquals, "&=")
-			case '&':
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokAmpersandAmpersandEquals, "&&=")
-				}
-				return l.mkPeekTok(tokAmpersandAmpersand, "&&")
-			}
-			return l.mkPeekTok(tokAmpersand, "&")
-
-		case r == '%':
-			// '%' or '%='
-			if l.peek(1) == '=' {
-				return l.mkPeekTok(tokPercentEquals, "%=")
-			}
-			return l.mkPeekTok(tokPercent, "%")
-
-		case r == '?':
-			// '?' or '?.' or '??' or '??='
-			switch l.peek(1) {
-			case '?':
-				if l.peek(2) == '=' {
-					return l.mkPeekTok(tokQuestionQuestionEquals, "??=")
-				}
-				return l.mkPeekTok(tokQuestionQuestion, "??")
-			case '.':
-				if !isNumber(l.peek(2)) {
-					return l.mkPeekTok(tokQuestionDot, "?.")
-				}
-			}
-			return l.mkPeekTok(tokQuestion, "?")
+		case isPunctuator(r):
+			return l.scanPunctuator(r)
 		}
+	}
+}
+
+func (l *Scanner) scanPunctuator(r rune) *Token {
+	switch r {
+	case '(':
+		return mkToken(tokOpenParen, "(")
+	case ')':
+		return mkToken(tokCloseParen, ")")
+	case '{':
+		return mkToken(tokOpenBrace, "{")
+	case '}':
+		return mkToken(tokCloseBrace, "}")
+	case '[':
+		return mkToken(tokOpenBracket, "[")
+	case ']':
+		return mkToken(tokCloseBracket, "]")
+	case ',':
+		return mkToken(tokComma, ",")
+	case ':':
+		return mkToken(tokColon, ":")
+	case ';':
+		return mkToken(tokSemicolon, ";")
+	case '~':
+		return mkToken(tokTilde, "~")
+
+	case '=':
+		// '=' or '=>' or '==' or '==='
+		switch l.peek(1) {
+		case '=':
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokEqualsEqualsEquals, "===")
+			}
+			return l.mkPeekTok(tokEqualsEquals, "==")
+		case '>':
+			return l.mkPeekTok(tokEqualsGreaterThan, "=>")
+		}
+		return l.mkPeekTok(tokEquals, "=")
+
+	case '+':
+		// '+' or '+=' or '++'
+		switch l.peek(1) {
+		case '=':
+			return l.mkPeekTok(tokPlusEquals, "+=")
+		case '+':
+			return l.mkPeekTok(tokPlusPlus, "++")
+		}
+		return l.mkPeekTok(tokPlus, "+")
+
+	case '-':
+		// '-' or '-=' or '--'
+		switch l.peek(1) {
+		case '=':
+			return l.mkPeekTok(tokMinusEquals, "-=")
+		case '-':
+			return l.mkPeekTok(tokMinusMinus, "--")
+		}
+		return l.mkPeekTok(tokMinus, "-")
+
+	case '*':
+		// '*' or '*=' or '**' or '**='
+		switch l.peek(1) {
+		case '=':
+			return l.mkPeekTok(tokAsteriskEquals, "*=")
+		case '*':
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokAsteriskAsteriskEquals, "**=")
+			}
+			return l.mkPeekTok(tokAsteriskAsterisk, "**")
+		}
+		return l.mkPeekTok(tokAsterisk, "*")
+
+	case '/':
+		// '/' or '/=' or '//' or '/* ... */'
+		switch l.peek(1) {
+		case '=':
+			return l.mkPeekTok(tokSlashEquals, "/=")
+		case '/':
+			// Single line comment
+		case '*':
+			// Multi line comment
+		}
+		return l.mkPeekTok(tokSlash, "/")
+
+	case '>':
+		// '>' or '>>' or '>>>' or '>=' or '>>=' or '>>>='
+		switch l.peek(1) {
+		case '>':
+			switch l.peek(2) {
+			case '>':
+				if l.peek(3) == '=' {
+					return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThanEquals, ">>>=")
+				}
+				return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThan, ">>>")
+			case '=':
+				return l.mkPeekTok(tokGreaterThanGreaterThanEquals, ">>=")
+			}
+			return l.mkPeekTok(tokGreaterThanGreaterThan, ">>")
+		case '=':
+			return l.mkPeekTok(tokGreaterThanEquals, ">=")
+		}
+		return l.mkPeekTok(tokGreaterThan, ">")
+
+	case '<':
+		// '<' or '<<' or '<=' or '<<='
+		switch l.peek(1) {
+		case '<':
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokLessThanLessThanEquals, "<<=")
+			}
+			return l.mkPeekTok(tokLessThanLessThan, "<<")
+		case '=':
+			return l.mkPeekTok(tokLessThanEquals, "<=")
+		}
+		return l.mkPeekTok(tokLessThan, "<")
+
+	case '!':
+		// '!' or '!=' or '!=='
+		if l.peek(1) == '=' {
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokExclamationEqualsEquals, "!==")
+			}
+			return l.mkPeekTok(tokExclamationEquals, "!=")
+		}
+		return l.mkPeekTok(tokExclamation, "!")
+
+	case '^':
+		// '^' or '^='
+		if l.peek(1) == '=' {
+			return l.mkPeekTok(tokCaretEquals, "^=")
+		}
+		return l.mkPeekTok(tokCaret, "^")
+
+	case '|':
+		// '|' or '|=' or '||' or '||='
+		switch l.peek(1) {
+		case '=':
+			return l.mkPeekTok(tokBarEquals, "|=")
+		case '|':
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokBarBarEquals, "||=")
+			}
+			return l.mkPeekTok(tokBarBar, "||")
+		}
+		return l.mkPeekTok(tokBar, "|")
+
+	case '&':
+		// '&' or '&=' or '&&' or '&&='
+		switch l.peek(1) {
+		case '=':
+			return l.mkPeekTok(tokAmpersandEquals, "&=")
+		case '&':
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokAmpersandAmpersandEquals, "&&=")
+			}
+			return l.mkPeekTok(tokAmpersandAmpersand, "&&")
+		}
+		return l.mkPeekTok(tokAmpersand, "&")
+
+	case '%':
+		// '%' or '%='
+		if l.peek(1) == '=' {
+			return l.mkPeekTok(tokPercentEquals, "%=")
+		}
+		return l.mkPeekTok(tokPercent, "%")
+
+	case '?':
+		// '?' or '?.' or '??' or '??='
+		switch l.peek(1) {
+		case '?':
+			if l.peek(2) == '=' {
+				return l.mkPeekTok(tokQuestionQuestionEquals, "??=")
+			}
+			return l.mkPeekTok(tokQuestionQuestion, "??")
+		case '.':
+			if !isNumber(l.peek(2)) {
+				return l.mkPeekTok(tokQuestionDot, "?.")
+			}
+		}
+		return l.mkPeekTok(tokQuestion, "?")
+	default:
+		return l.mkPeekTok(tokSyntaxError, "")
+
 	}
 }
 
@@ -288,6 +298,16 @@ func isAlphanum(r rune) bool {
 // isNumber reports whether r is a numeric literal.
 func isNumber(r rune) bool {
 	return '0' <= r && r <= '9'
+}
+
+// isPunctuator reports whether r is a punctuator
+func isPunctuator(r rune) bool {
+	switch r {
+	case '{', '}', '(', ')', '[', ']', '.', ';', ',', '<', '>', '=', '!', '+', '-', '*', '%', '&', '|', '^', '~', '?', ':', '/':
+		return true
+	default:
+		return false
+	}
 }
 
 // isSpace checks whether r is a space as defined
