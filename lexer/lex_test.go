@@ -71,7 +71,7 @@ func TestKeyword(t *testing.T) {
 func TestPeek(t *testing.T) {
 	sample := `
 	=== == => = + += ++ - -= -- * *= ** **= / /= > >> >>> >= >>= >>>=
-	! != !== < << <= <<=
+	! != !== < << <= <<= ^ ^= | |= || ||=
 	`
 
 	tests := []struct {
@@ -118,6 +118,16 @@ func TestPeek(t *testing.T) {
 		{tokLessThanLessThan, "<<"},
 		{tokLessThanEquals, "<="},
 		{tokLessThanLessThanEquals, "<<="},
+
+		// '^' or '^='
+		{tokCaret, "^"},
+		{tokCaretEquals, "^="},
+
+		// '|' or '|=' or '||' or '||='
+		{tokBar, "|"},
+		{tokBarEquals, "|="},
+		{tokBarBar, "||"},
+		{tokBarBarEquals, "||="},
 	}
 
 	r := io.RuneReader(strings.NewReader(sample))

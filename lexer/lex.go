@@ -106,7 +106,7 @@ func (l *Scanner) next() *Token {
 			case '>':
 				return l.mkPeekTok(tokEqualsGreaterThan, "=>")
 			}
-			return mkToken(tokEquals, "=")
+			return l.mkPeekTok(tokEquals, "=")
 
 		case r == '+':
 			// '+' or '+=' or '++'
@@ -116,7 +116,7 @@ func (l *Scanner) next() *Token {
 			case '+':
 				return l.mkPeekTok(tokPlusPlus, "++")
 			}
-			return mkToken(tokPlus, "+")
+			return l.mkPeekTok(tokPlus, "+")
 
 		case r == '-':
 			// '-' or '-=' or '--'
@@ -126,7 +126,7 @@ func (l *Scanner) next() *Token {
 			case '-':
 				return l.mkPeekTok(tokMinusMinus, "--")
 			}
-			return mkToken(tokMinus, "-")
+			return l.mkPeekTok(tokMinus, "-")
 
 		case r == '*':
 			// '*' or '*=' or '**' or '**='
@@ -139,7 +139,7 @@ func (l *Scanner) next() *Token {
 				}
 				return l.mkPeekTok(tokAsteriskAsterisk, "**")
 			}
-			return mkToken(tokAsterisk, "*")
+			return l.mkPeekTok(tokAsterisk, "*")
 
 		case r == '/':
 			// '/' or '/=' or '//' or '/* ... */'
@@ -151,7 +151,7 @@ func (l *Scanner) next() *Token {
 			case '*':
 				// Multi line comment
 			}
-			return mkToken(tokSlash, "/")
+			return l.mkPeekTok(tokSlash, "/")
 
 		case r == '>':
 			// '>' or '>>' or '>>>' or '>=' or '>>=' or '>>>='
@@ -170,7 +170,7 @@ func (l *Scanner) next() *Token {
 			case '=':
 				return l.mkPeekTok(tokGreaterThanEquals, ">=")
 			}
-			return mkToken(tokGreaterThan, ">")
+			return l.mkPeekTok(tokGreaterThan, ">")
 
 		case r == '<':
 			// '<' or '<<' or '<=' or '<<='
@@ -183,7 +183,7 @@ func (l *Scanner) next() *Token {
 			case '=':
 				return l.mkPeekTok(tokLessThanEquals, "<=")
 			}
-			return mkToken(tokLessThan, "<")
+			return l.mkPeekTok(tokLessThan, "<")
 
 		case r == '!':
 			// '!' or '!=' or '!=='
@@ -193,7 +193,27 @@ func (l *Scanner) next() *Token {
 				}
 				return l.mkPeekTok(tokExclamationEquals, "!=")
 			}
-			return mkToken(tokExclamation, "!")
+			return l.mkPeekTok(tokExclamation, "!")
+
+		case r == '^':
+			// '^' or '^='
+			if l.peek(1) == '=' {
+				return l.mkPeekTok(tokCaretEquals, "^=")
+			}
+			return l.mkPeekTok(tokCaret, "^")
+
+		case r == '|':
+			// '|' or '|=' or '||' or '||='
+			switch l.peek(1) {
+			case '=':
+				return l.mkPeekTok(tokBarEquals, "|=")
+			case '|':
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokBarBarEquals, "||=")
+				}
+				return l.mkPeekTok(tokBarBar, "||")
+			}
+			return l.mkPeekTok(tokBar, "|")
 		}
 	}
 }
