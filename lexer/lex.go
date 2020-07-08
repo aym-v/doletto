@@ -214,6 +214,41 @@ func (l *Scanner) next() *Token {
 				return l.mkPeekTok(tokBarBar, "||")
 			}
 			return l.mkPeekTok(tokBar, "|")
+
+		case r == '&':
+			// '&' or '&=' or '&&' or '&&='
+			switch l.peek(1) {
+			case '=':
+				return l.mkPeekTok(tokAmpersandEquals, "&=")
+			case '&':
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokAmpersandAmpersandEquals, "&&=")
+				}
+				return l.mkPeekTok(tokAmpersandAmpersand, "&&")
+			}
+			return l.mkPeekTok(tokAmpersand, "&")
+
+		case r == '%':
+			// '%' or '%='
+			if l.peek(1) == '=' {
+				return l.mkPeekTok(tokPercentEquals, "%=")
+			}
+			return l.mkPeekTok(tokPercent, "%")
+
+		case r == '?':
+			// '?' or '?.' or '??' or '??='
+			switch l.peek(1) {
+			case '?':
+				if l.peek(2) == '=' {
+					return l.mkPeekTok(tokQuestionQuestionEquals, "??=")
+				}
+				return l.mkPeekTok(tokQuestionQuestion, "??")
+			case '.':
+				if !isNumber(l.peek(2)) {
+					return l.mkPeekTok(tokQuestionDot, "?.")
+				}
+			}
+			return l.mkPeekTok(tokQuestion, "?")
 		}
 	}
 }
@@ -250,7 +285,7 @@ func isAlphanum(r rune) bool {
 	return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
 }
 
-// isAlphaNumeric reports whether r is a numeric literal.
+// isNumber reports whether r is a numeric literal.
 func isNumber(r rune) bool {
 	return '0' <= r && r <= '9'
 }

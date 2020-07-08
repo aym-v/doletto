@@ -71,7 +71,7 @@ func TestKeyword(t *testing.T) {
 func TestPeek(t *testing.T) {
 	sample := `
 	=== == => = + += ++ - -= -- * *= ** **= / /= > >> >>> >= >>= >>>=
-	! != !== < << <= <<= ^ ^= | |= || ||=
+	! != !== < << <= <<= ^ ^= | |= || ||= & &= && &&= % %= ? ?. ?? ??=
 	`
 
 	tests := []struct {
@@ -97,6 +97,8 @@ func TestPeek(t *testing.T) {
 		{tokAsteriskEquals, "*="},
 		{tokAsteriskAsterisk, "**"},
 		{tokAsteriskAsteriskEquals, "**="},
+
+		// '/' or '/='
 		{tokSlash, "/"},
 		{tokSlashEquals, "/="},
 
@@ -128,6 +130,22 @@ func TestPeek(t *testing.T) {
 		{tokBarEquals, "|="},
 		{tokBarBar, "||"},
 		{tokBarBarEquals, "||="},
+
+		// '&' or '&=' or '&&' or '&&='
+		{tokAmpersand, "&"},
+		{tokAmpersandEquals, "&="},
+		{tokAmpersandAmpersand, "&&"},
+		{tokAmpersandAmpersandEquals, "&&="},
+
+		// '%' or '%='
+		{tokPercent, "%"},
+		{tokPercentEquals, "%="},
+
+		// '?' or '?.' or '??' or '??='
+		{tokQuestion, "?"},
+		{tokQuestionDot, "?."},
+		{tokQuestionQuestion, "??"},
+		{tokQuestionQuestionEquals, "??="},
 	}
 
 	r := io.RuneReader(strings.NewReader(sample))
