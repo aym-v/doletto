@@ -57,7 +57,7 @@ func (l *Scanner) peek(n int) rune {
 }
 
 // resetPeek resets the peekRunes queue and calls mkToken
-func (l *Scanner) mkPeekTok(typ Type, text string) *Token {
+func (l *Scanner) tok(typ Type, text string) *Token {
 	l.peekRunes = nil
 	return mkToken(typ, text)
 }
@@ -109,58 +109,58 @@ func (l *Scanner) lexPunctuator(r rune) *Token {
 		switch l.peek(1) {
 		case '=':
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokEqualsEqualsEquals, "===")
+				return l.tok(tokEqualsEqualsEquals, "===")
 			}
-			return l.mkPeekTok(tokEqualsEquals, "==")
+			return l.tok(tokEqualsEquals, "==")
 		case '>':
-			return l.mkPeekTok(tokEqualsGreaterThan, "=>")
+			return l.tok(tokEqualsGreaterThan, "=>")
 		}
-		return l.mkPeekTok(tokEquals, "=")
+		return l.tok(tokEquals, "=")
 
 	case '+':
 		// '+' or '+=' or '++'
 		switch l.peek(1) {
 		case '=':
-			return l.mkPeekTok(tokPlusEquals, "+=")
+			return l.tok(tokPlusEquals, "+=")
 		case '+':
-			return l.mkPeekTok(tokPlusPlus, "++")
+			return l.tok(tokPlusPlus, "++")
 		}
-		return l.mkPeekTok(tokPlus, "+")
+		return l.tok(tokPlus, "+")
 
 	case '-':
 		// '-' or '-=' or '--'
 		switch l.peek(1) {
 		case '=':
-			return l.mkPeekTok(tokMinusEquals, "-=")
+			return l.tok(tokMinusEquals, "-=")
 		case '-':
-			return l.mkPeekTok(tokMinusMinus, "--")
+			return l.tok(tokMinusMinus, "--")
 		}
-		return l.mkPeekTok(tokMinus, "-")
+		return l.tok(tokMinus, "-")
 
 	case '*':
 		// '*' or '*=' or '**' or '**='
 		switch l.peek(1) {
 		case '=':
-			return l.mkPeekTok(tokAsteriskEquals, "*=")
+			return l.tok(tokAsteriskEquals, "*=")
 		case '*':
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokAsteriskAsteriskEquals, "**=")
+				return l.tok(tokAsteriskAsteriskEquals, "**=")
 			}
-			return l.mkPeekTok(tokAsteriskAsterisk, "**")
+			return l.tok(tokAsteriskAsterisk, "**")
 		}
-		return l.mkPeekTok(tokAsterisk, "*")
+		return l.tok(tokAsterisk, "*")
 
 	case '/':
 		// '/' or '/=' or '//' or '/* ... */'
 		switch l.peek(1) {
 		case '=':
-			return l.mkPeekTok(tokSlashEquals, "/=")
+			return l.tok(tokSlashEquals, "/=")
 		case '/':
 			// Single line comment
 		case '*':
 			// Multi line comment
 		}
-		return l.mkPeekTok(tokSlash, "/")
+		return l.tok(tokSlash, "/")
 
 	case '>':
 		// '>' or '>>' or '>>>' or '>=' or '>>=' or '>>>='
@@ -169,98 +169,98 @@ func (l *Scanner) lexPunctuator(r rune) *Token {
 			switch l.peek(2) {
 			case '>':
 				if l.peek(3) == '=' {
-					return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThanEquals, ">>>=")
+					return l.tok(tokGreaterThanGreaterThanGreaterThanEquals, ">>>=")
 				}
-				return l.mkPeekTok(tokGreaterThanGreaterThanGreaterThan, ">>>")
+				return l.tok(tokGreaterThanGreaterThanGreaterThan, ">>>")
 			case '=':
-				return l.mkPeekTok(tokGreaterThanGreaterThanEquals, ">>=")
+				return l.tok(tokGreaterThanGreaterThanEquals, ">>=")
 			}
-			return l.mkPeekTok(tokGreaterThanGreaterThan, ">>")
+			return l.tok(tokGreaterThanGreaterThan, ">>")
 		case '=':
-			return l.mkPeekTok(tokGreaterThanEquals, ">=")
+			return l.tok(tokGreaterThanEquals, ">=")
 		}
-		return l.mkPeekTok(tokGreaterThan, ">")
+		return l.tok(tokGreaterThan, ">")
 
 	case '<':
 		// '<' or '<<' or '<=' or '<<='
 		switch l.peek(1) {
 		case '<':
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokLessThanLessThanEquals, "<<=")
+				return l.tok(tokLessThanLessThanEquals, "<<=")
 			}
-			return l.mkPeekTok(tokLessThanLessThan, "<<")
+			return l.tok(tokLessThanLessThan, "<<")
 		case '=':
-			return l.mkPeekTok(tokLessThanEquals, "<=")
+			return l.tok(tokLessThanEquals, "<=")
 		}
-		return l.mkPeekTok(tokLessThan, "<")
+		return l.tok(tokLessThan, "<")
 
 	case '!':
 		// '!' or '!=' or '!=='
 		if l.peek(1) == '=' {
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokExclamationEqualsEquals, "!==")
+				return l.tok(tokExclamationEqualsEquals, "!==")
 			}
-			return l.mkPeekTok(tokExclamationEquals, "!=")
+			return l.tok(tokExclamationEquals, "!=")
 		}
-		return l.mkPeekTok(tokExclamation, "!")
+		return l.tok(tokExclamation, "!")
 
 	case '^':
 		// '^' or '^='
 		if l.peek(1) == '=' {
-			return l.mkPeekTok(tokCaretEquals, "^=")
+			return l.tok(tokCaretEquals, "^=")
 		}
-		return l.mkPeekTok(tokCaret, "^")
+		return l.tok(tokCaret, "^")
 
 	case '|':
 		// '|' or '|=' or '||' or '||='
 		switch l.peek(1) {
 		case '=':
-			return l.mkPeekTok(tokBarEquals, "|=")
+			return l.tok(tokBarEquals, "|=")
 		case '|':
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokBarBarEquals, "||=")
+				return l.tok(tokBarBarEquals, "||=")
 			}
-			return l.mkPeekTok(tokBarBar, "||")
+			return l.tok(tokBarBar, "||")
 		}
-		return l.mkPeekTok(tokBar, "|")
+		return l.tok(tokBar, "|")
 
 	case '&':
 		// '&' or '&=' or '&&' or '&&='
 		switch l.peek(1) {
 		case '=':
-			return l.mkPeekTok(tokAmpersandEquals, "&=")
+			return l.tok(tokAmpersandEquals, "&=")
 		case '&':
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokAmpersandAmpersandEquals, "&&=")
+				return l.tok(tokAmpersandAmpersandEquals, "&&=")
 			}
-			return l.mkPeekTok(tokAmpersandAmpersand, "&&")
+			return l.tok(tokAmpersandAmpersand, "&&")
 		}
-		return l.mkPeekTok(tokAmpersand, "&")
+		return l.tok(tokAmpersand, "&")
 
 	case '%':
 		// '%' or '%='
 		if l.peek(1) == '=' {
-			return l.mkPeekTok(tokPercentEquals, "%=")
+			return l.tok(tokPercentEquals, "%=")
 		}
-		return l.mkPeekTok(tokPercent, "%")
+		return l.tok(tokPercent, "%")
 
 	case '?':
 		// '?' or '?.' or '??' or '??='
 		switch l.peek(1) {
 		case '?':
 			if l.peek(2) == '=' {
-				return l.mkPeekTok(tokQuestionQuestionEquals, "??=")
+				return l.tok(tokQuestionQuestionEquals, "??=")
 			}
-			return l.mkPeekTok(tokQuestionQuestion, "??")
+			return l.tok(tokQuestionQuestion, "??")
 		case '.':
 			// Differentiate optional chaining punctuators (?.id) from conditional operators (? :)
 			if !isNumber(l.peek(2)) {
-				return l.mkPeekTok(tokQuestionDot, "?.")
+				return l.tok(tokQuestionDot, "?.")
 			}
 		}
-		return l.mkPeekTok(tokQuestion, "?")
+		return l.tok(tokQuestion, "?")
 	default:
-		return l.mkPeekTok(tokSyntaxError, "")
+		return l.tok(tokSyntaxError, "")
 
 	}
 }
