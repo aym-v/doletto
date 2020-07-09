@@ -1,10 +1,5 @@
 package lexer
 
-import (
-	"log"
-	"math/big"
-)
-
 // Type represents an ECMAScript token type
 type Type int
 
@@ -192,25 +187,20 @@ var keywords = map[string]Type{
 // Token represents an Ecmascript token
 type Token struct {
 	typ  Type
-	text string   // empty for numbers
-	num  *big.Int // nil for non-numbers
+	text string  // empty for numbers
+	num  float64 // nil for non-numbers
 }
 
 func mkToken(typ Type, text string) *Token {
-	if typ == tokNumericLiteral {
-		var z big.Int
-		num, ok := z.SetString(text, 0)
-		if !ok {
-			log.Fatalf("bad number syntax: %s", text)
-		}
-		return &Token{tokNumericLiteral, "", num}
-	}
-
 	t, ok := keywords[text]
 
 	if !ok {
 		t = typ
 	}
 
-	return &Token{t, text, nil}
+	return &Token{t, text, 0}
+}
+
+func mkNumericLiteral(num float64) *Token {
+	return &Token{tokNumericLiteral, "", num}
 }
