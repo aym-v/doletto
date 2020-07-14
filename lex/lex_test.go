@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/valaymerick/ecmascript/test"
+	"github.com/valaymerick/doletto/test"
 )
 
 func TestPeek(t *testing.T) {
@@ -133,14 +133,14 @@ func expectNumber(t *testing.T, in string, expected float64) {
 func TestNumericLiteral(t *testing.T) {
 	expectNumber(t, "0", 0.0)
 	expectNumber(t, "000", 0.0)
-	// expectNumber(t, "010", 8.0)
-	// expectNumber(t, "123", 123.0)
-	// expectNumber(t, "987", 987.0)
-	// expectNumber(t, "0000", 0.0)
-	// expectNumber(t, "0123", 83.0)
-	// expectNumber(t, "0123.4567", 83.0)
-	// expectNumber(t, "0987", 987.0)
-	// expectNumber(t, "0987.6543", 987.6543)
+	expectNumber(t, "010", 8.0)
+	expectNumber(t, "123", 123.0)
+	expectNumber(t, "987", 987.0)
+	expectNumber(t, "0000", 0.0)
+	expectNumber(t, "0123", 83.0)
+	expectNumber(t, "0123.4567", 83.0)
+	expectNumber(t, "0987", 987.0)
+	expectNumber(t, "0987.6543", 987.6543)
 	// expectNumber(t, "01289", 1289.0)
 	// expectNumber(t, "01289.345", 1289.0)
 	// expectNumber(t, "999999999", 999999999.0)
