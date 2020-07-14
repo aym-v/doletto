@@ -12,7 +12,7 @@ Doletto is a JavaScript interpreter compliant with ECMAScript as specified in [E
 To install:
 
 ```bash
-go get github.com/valaymerick/ecmascript
+go get github.com/valaymerick/doletto
 ```
 
 ## Roadmap
