@@ -1,8 +1,6 @@
 <p align="center" style="margin-bottom: 48px;">
-    <img width="80px" src="https://user-images.githubusercontent.com/18191750/87425115-615ab400-c5dd-11ea-81fa-5e726ddb04fe.png"/>
+    <img width="80px" src="https://user-images.githubusercontent.com/18191750/87425115-615ab400-c5dd-11ea-81fa-5e726ddb04fe.png" alt="Doletto logo"/>
 </p>
-
-# Doletto
 
 Doletto is a JavaScript interpreter compliant with ECMAScript as specified in [ECMA-262](https://tc39.es/ecma262/).
 
