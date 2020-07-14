@@ -1,4 +1,4 @@
-package lexer
+package lex
 
 // Type represents an ECMAScript token type
 type Type int

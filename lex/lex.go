@@ -1,9 +1,10 @@
-package lexer
+package lex
 
 import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"unicode"
 )
@@ -12,6 +13,7 @@ import (
 type Scanner struct {
 	r         io.RuneReader // input reader
 	peekRunes []rune        // peek runes queue
+	num       float64       // number buffer
 	buf       bytes.Buffer  // input buffer to hold current lexeme
 }
 
@@ -56,7 +58,7 @@ func (l *Scanner) peek(n int) rune {
 	return p
 }
 
-// resetPeek resets the peekRunes queue and calls mkToken
+// tok resets the peekRunes queue and calls mkToken
 func (l *Scanner) tok(typ Type, text string) *Token {
 	l.peekRunes = nil
 	return mkToken(typ, text)
@@ -71,17 +73,17 @@ func (l *Scanner) next() *Token {
 			return mkToken(tokAt, "@")
 		case isSpace(r):
 		case isIdentifierStart(r):
-			// names and keywords
 			return l.alphanum(tokIdentifier, r)
-		case isNumber(r):
+		case isNumericLiteral(r):
+			return l.number(r)
 		case isPunctuator(r):
-			return l.lexPunctuator(r)
+			return l.punctuator(r)
 		}
 	}
 }
 
-// lexPunctuator returns the next punctuator token
-func (l *Scanner) lexPunctuator(r rune) *Token {
+// punctuator returns the next punctuator token
+func (l *Scanner) punctuator(r rune) *Token {
 	switch r {
 	case '(':
 		return mkToken(tokOpenParen, "(")
@@ -253,8 +255,8 @@ func (l *Scanner) lexPunctuator(r rune) *Token {
 			}
 			return l.tok(tokQuestionQuestion, "??")
 		case '.':
-			// Differentiate optional chaining punctuators (?.id) from conditional operators (? :)
-			if !isNumber(l.peek(2)) {
+			// differentiate optional chaining punctuators (?.id) from conditional operators (? :)
+			if !unicode.IsDigit(l.peek(2)) {
 				return l.tok(tokQuestionDot, "?.")
 			}
 		}
@@ -287,19 +289,99 @@ func (l *Scanner) alphanum(typ Type, r rune) *Token {
 	return mkToken(typ, l.buf.String())
 }
 
+func (l *Scanner) number(r rune) *Token {
+	base := 0.0
+	isLegacyOctal := false
+
+	switch r {
+	case '.':
+		// '.' or '...'
+		if l.peek(1) == '.' && l.peek(2) == '.' {
+			return l.tok(tokDotDotDot, "...")
+		}
+		return l.tok(tokDot, ".")
+
+	case '0':
+		// binary, octal or hexadecimal literal
+		switch l.peek(1) {
+		case 'b', 'B':
+			base = 2
+
+		case 'o', 'O':
+			base = 8
+
+		case 'x', 'X':
+			base = 16
+
+		case '0', '1', '2', '3', '4', '5', '6', '7':
+			base = 8
+			isLegacyOctal = true
+		}
+	}
+
+	for {
+		next := l.read()
+		switch next {
+		case '_':
+			b := l.buf.String()
+
+			if b[len(b)-1] == '_' {
+				l.syntaxError()
+			}
+
+		case '0', '1':
+			l.num = l.num*base + float64(next-'0')
+
+		case '2', '3', '4', '5', '6', '7':
+			if base == 2 {
+				l.syntaxError()
+			}
+			l.num = l.num*base + float64(next-'0')
+
+		case '8', '9':
+			if isLegacyOctal {
+				isInvalidLegacyOctalLiteral = true
+			} else if base < 10 {
+				l.syntaxError()
+			}
+			l.num = l.num*base + float64(next-'0')
+		}
+
+	}
+
+	return mkNumericLiteral(0.0)
+}
+
+// func (l *Scanner) integerLiteral(r rune, base float64) *Token {
+
+// }
+
 // alphanum creates a numeric literal token using the buffer.
 // func (l *Scanner) number(r rune) *Token {
 
 // }
+
+// Panic represents a lexer panic
+type Panic struct{}
+
+func (l *Scanner) syntaxError() {
+	log.Printf("Syntax Error")
+	panic(Panic{})
+}
 
 // isAlphaNumeric reports whether r is a letter, digit, or underscore.
 func isAlphanum(r rune) bool {
 	return r == '_' || r == '$' || unicode.IsLetter(r) || unicode.IsDigit(r)
 }
 
-// isNumber reports whether r is a numeric literal.
-func isNumber(r rune) bool {
-	return '0' <= r && r <= '9'
+// isNumericLiteral reports whether r is a numeric literal.
+func isNumericLiteral(r rune) bool {
+	switch r {
+	case '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		return true
+	default:
+		return false
+	}
 }
 
 // isPunctuator reports whether r is a punctuator
