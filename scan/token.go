@@ -1,4 +1,4 @@
-package lex
+package scan
 
 // Type represents an ECMAScript token type
 type Type int

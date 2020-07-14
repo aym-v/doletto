@@ -1,4 +1,4 @@
-package lex
+package scan
 
 import "unicode"
 
