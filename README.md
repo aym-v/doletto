@@ -1,15 +1,15 @@
-# ecmascript
+# Doletto
 
-Implementation of a Javascript and Typescript interpreter using the [ECMAScript 2021](https://tc39.es/ecma262/) specification.
+Doletto is a JavaScript interpreter compliant with ECMAScript as specified in [ECMA-262](https://tc39.es/ecma262/).
 
-This is a learning experiment to dig into advanced ECMAScript, Compilers and Go.
+This is a toy project allowing me to deepen my knowledge in Go, Javascript and compiler design.
 
 ## Contribute
 
 To install:
 
 ```bash
-% go get github.com/valaymerick/ecmascript
+go get github.com/valaymerick/ecmascript
 ```
 
 ## Roadmap
@@ -22,3 +22,5 @@ To install:
 - [ ] Parser
 - [ ] Runtime (?)
   - [ ] Event-loop
+
+The Doletto title was [generated using GPT-2](https://github.com/turtlesoupy/this-word-does-not-exist).
