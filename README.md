@@ -1,6 +1,6 @@
 <p align="center">
-    <img width="100px" height="200px" style="object-fit: contain;" src="https://user-images.githubusercontent.com/18191750/87425115-615ab400-c5dd-11ea-81fa-5e726ddb04fe.png
-" alt="" >
+    <img width="100px" height="200px" style="object-fit: contain;" src="https://user-images.githubusercontent.com/18191750/87425115-615ab400-c5dd-11ea-81fa-5e726ddb04fe.png"/>
+</p>
 
 # Doletto
 
