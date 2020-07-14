@@ -7,8 +7,6 @@
 
 Doletto is a JavaScript interpreter compliant with ECMAScript as specified in [ECMA-262](https://tc39.es/ecma262/).
 
-This is a toy project allowing me to deepen my knowledge in Go, Javascript and compiler design.
-
 ## Contribute
 
 To install:
