@@ -1,3 +1,5 @@
+<br/><br/>
+
 <p align="center">
     <img width="80px" src="https://user-images.githubusercontent.com/18191750/87425115-615ab400-c5dd-11ea-81fa-5e726ddb04fe.png" alt="Doletto logo"/>
 </p>
